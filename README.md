@@ -1,0 +1,1 @@
+# fintech-enterprise-gitops-manifest
