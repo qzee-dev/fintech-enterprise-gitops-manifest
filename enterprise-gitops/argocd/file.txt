@@ -1,1 +1,7 @@
-
+project.yaml
+     │
+     ├── Which Git repo?
+     │
+     ├── Which Kubernetes cluster?
+     │
+     └── Which namespaces?
