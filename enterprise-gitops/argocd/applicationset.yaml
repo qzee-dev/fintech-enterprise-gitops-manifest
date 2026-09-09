@@ -20,6 +20,6 @@ production-user-service
 production-payment-service
 production-wallet-service
 production-transaction-service
-production-production-notification-service
+production-notification-service
 production-fraud-service
 ...
