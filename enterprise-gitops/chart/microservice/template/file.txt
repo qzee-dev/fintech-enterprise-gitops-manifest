@@ -1,0 +1,11 @@
+Step 16 — Validate the Helm chart
+
+If Helm is installed:
+
+1)helm lint charts/microservice
+
+then:
+helm template service-1 \
+  charts/microservice \
+  --set image.repository="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/service-1" \
+  --set image.tag="TEST"
