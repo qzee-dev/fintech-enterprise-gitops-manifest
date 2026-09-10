@@ -1,3 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+
+metadata:
+  name: fintech-microservices
+  namespace: argocd
+
+spec:
+  goTemplate: true
+
+  generators:
+    - git:
+        repoURL: https://github.com/qzee-dev/fintech-enterprise-gitops-manifest.git
+        revision: main
+
+        directories:
+          - path: environments/*/*
+
+  template:
+
+    metadata:
+      name: '{{index .path.segments 1}}-{{index .path.segments 2}}'
+
+    spec:
+      project: fintech-microservices
+
+      source:
+        repoURL: https://github.com/qzee-dev/fintech-enterprise-gitops-manifest.git
+        targetRevision: main
+
+        path: chart/microservice
+
+        helm:
+          valueFiles:
+            - '../../environments/{{index .path.segments 1}}/{{index .path.segments 2}}/values.yaml'
+
+      destination:
+        server: https://kubernetes.default.svc
+
+        namespace: '{{index .path.segments 1}}-{{index .path.segments 2}}'
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+
+        syncOptions:
+          - CreateNamespace=true
+
+
+
+
 dev-api-gateway
 dev-user-service
 dev-payment-service
