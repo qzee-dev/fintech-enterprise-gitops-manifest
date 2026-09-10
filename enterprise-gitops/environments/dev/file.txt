@@ -1,1 +1,13 @@
-
+CI builds payment-service
+        ↓
+Push image to ECR
+        ↓
+ECR: payment-service:<immutable-tag>
+        ↓
+CI updates DEV values.yaml
+        ↓
+Git commit / PR
+        ↓
+Argo CD detects Git change
+        ↓
+Helm deploys new image
