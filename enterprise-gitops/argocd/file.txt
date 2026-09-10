@@ -5,3 +5,8 @@ project.yaml
      ├── Which Kubernetes cluster?
      │
      └── Which namespaces?
+
+
+
+Application set:
+Instead of creating 50 ArgoCD Applications manually, you create one ApplicationSet and it generates them automatically.
