@@ -1,1 +1,96 @@
+name: Promote Image to PRODUCTION
 
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: "Microservice to promote"
+        required: true
+        type: choice
+        options:
+          - api-gateway
+          - user-service
+          - payment-service
+          - wallet-service
+          - transaction-service
+          - notification-service
+          - fraud-service
+
+      image_tag:
+        description: "Image tag successfully tested in STAGING"
+        required: true
+        type: string
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+
+      - name: Update production image
+        env:
+          SERVICE: ${{ inputs.service }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import re
+
+          service = os.environ["SERVICE"]
+          image_tag = os.environ["IMAGE_TAG"]
+
+          file = Path(
+              f"environments/production/{service}/values.yaml"
+          )
+
+          text = file.read_text()
+
+          text, count = re.subn(
+              r'(^\s*tag:\s*")[^"]*(")',
+              rf'\g<1>{image_tag}\g<2>',
+              text,
+              count=1,
+              flags=re.MULTILINE
+          )
+
+          if count != 1:
+              raise SystemExit(
+                  f"Could not update image tag in {file}"
+              )
+
+          file.write_text(text)
+          PY
+
+      - name: Create production PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SERVICE: ${{ inputs.service }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          BRANCH="promote/${SERVICE}-${IMAGE_TAG}"
+
+          git checkout -b "$BRANCH"
+
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "environments/production/${SERVICE}/values.yaml"
+
+          git commit \
+            -m "promote ${SERVICE} ${IMAGE_TAG} to production"
+
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Promote ${SERVICE} ${IMAGE_TAG} to production" \
+            --body "Promote the image successfully tested in staging."
