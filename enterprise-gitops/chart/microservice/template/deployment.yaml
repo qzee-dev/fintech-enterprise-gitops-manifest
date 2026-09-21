@@ -21,7 +21,8 @@ spec:
 
       containers:
         - name: {{ .Release.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image:  "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
+
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
           ports:
