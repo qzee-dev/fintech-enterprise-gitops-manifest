@@ -1,1 +1,9 @@
+12. environments/production/{fraud,transaction,etc}/values.yaml (HIGHEST TIER)
+Same pattern as prod payment, resources:
 
+fraud-service: 3-10 replicas, 400m-1500m CPU, 768Mi-1.5Gi mem, minAvailable: 2
+transaction-service: 4-15 replicas, 600m-2500m CPU, 1.5Gi-2.5Gi mem, minAvailable: 3 (most critical)
+user-service: 3-10 replicas, 300m-1200m CPU, 768Mi-1.5Gi mem, minAvailable: 2
+wallet-service: 3-10 replicas, 300m-1200m CPU, 768Mi-1.5Gi mem, minAvailable: 2
+notification-service: 3-8 replicas, 200m-1000m CPU, 512Mi-1Gi mem, minAvailable: 2
+api-gateway: 4-15 replicas, 500m-2000m CPU, 1Gi-2Gi mem, minAvailable: 3 (customer-facing)
