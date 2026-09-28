@@ -1,8 +1,8 @@
-replicaCount: 2
+replicaCount: 3
 
 image:
-  repository: "123456789012.dkr.ecr.eu-west-1.amazonaws.com/payment-service"
-  tag: "8-a31f92c"
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/payment-service"
+  tag: "1.0.0"
   pullPolicy: IfNotPresent
 
 service:
@@ -12,17 +12,18 @@ service:
 
 resources:
   requests:
-    cpu: 100m
-    memory: 256Mi
-  limits:
-    cpu: 500m
+    cpu: 200m
     memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
 
 autoscaling:
   enabled: true
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 3
+  maxReplicas: 8
   targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 75
 
 serviceAccount:
   create: true
@@ -31,6 +32,15 @@ serviceAccount:
 env:
   - name: SPRING_PROFILES_ACTIVE
     value: "staging"
+  - name: ENVIRONMENT
+    value: "staging"
 
 ingress:
   enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+networkPolicy:
+  enabled: true
