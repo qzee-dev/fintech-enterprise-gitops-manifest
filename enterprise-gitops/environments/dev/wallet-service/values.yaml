@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: "<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/wallet-service"
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fraud-service"
   tag: "1.0.0"
   pullPolicy: IfNotPresent
 
@@ -12,16 +12,16 @@ service:
 
 resources:
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 150m
+    memory: 384Mi
   limits:
-    cpu: 500m
-    memory: 512Mi
+    cpu: 800m
+    memory: 768Mi
 
 autoscaling:
   enabled: true
   minReplicas: 2
-  maxReplicas: 5
+  maxReplicas: 6
   targetCPUUtilizationPercentage: 70
 
 serviceAccount:
@@ -31,6 +31,15 @@ serviceAccount:
 env:
   - name: SPRING_PROFILES_ACTIVE
     value: "dev"
+  - name: ENVIRONMENT
+    value: "dev"
 
 ingress:
   enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: true
