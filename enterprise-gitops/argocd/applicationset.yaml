@@ -12,14 +12,13 @@ spec:
     - git:
         repoURL: https://github.com/qzee-dev/fintech-enterprise-gitops-manifest.git
         revision: main
-
         directories:
-          - path: environments/*/*
+          - path: enterprise-gitops/environments/*/*
 
   template:
 
     metadata:
-      name: '{{index .path.segments 1}}-{{index .path.segments 2}}'
+      name: '{{index .path.segments 2}}-{{index .path.segments 3}}'
 
     spec:
       project: fintech-microservices
@@ -28,16 +27,16 @@ spec:
         repoURL: https://github.com/qzee-dev/fintech-enterprise-gitops-manifest.git
         targetRevision: main
 
-        path: chart/microservice
+        path: enterprise-gitops/chart/microservice
 
         helm:
           valueFiles:
-            - '../../environments/{{index .path.segments 1}}/{{index .path.segments 2}}/values.yaml'
+            - '../../../../environments/{{index .path.segments 2}}/{{index .path.segments 3}}/values.yaml'
 
       destination:
         server: https://kubernetes.default.svc
 
-        namespace: '{{index .path.segments 1}}-{{index .path.segments 2}}'
+        namespace: '{{index .path.segments 2}}-{{index .path.segments 3}}'
 
       syncPolicy:
         automated:
@@ -46,7 +45,3 @@ spec:
 
         syncOptions:
           - CreateNamespace=true
-
-
-
-
