@@ -1,8 +1,8 @@
 replicaCount: 3
 
 image:
-  repository: "123456789012.dkr.ecr.eu-west-1.amazonaws.com/payment-service"
-  tag: "8-a31f92c"
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/payment-service"
+  tag: "1.0.0"
   pullPolicy: IfNotPresent
 
 service:
@@ -12,17 +12,18 @@ service:
 
 resources:
   requests:
-    cpu: 200m
-    memory: 512Mi
-  limits:
-    cpu: 1000m
+    cpu: 500m
     memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 2Gi
 
 autoscaling:
   enabled: true
   minReplicas: 3
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 70
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 70
 
 serviceAccount:
   create: true
@@ -31,6 +32,28 @@ serviceAccount:
 env:
   - name: SPRING_PROFILES_ACTIVE
     value: "production"
+  - name: ENVIRONMENT
+    value: "production"
 
 ingress:
   enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+networkPolicy:
+  enabled: true
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - payment-service
+          topologyKey: kubernetes.io/hostname
