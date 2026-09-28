@@ -1,0 +1,225 @@
+---
+# Development Environment
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-payment-service
+  labels:
+    environment: dev
+    tier: application
+  annotations:
+    description: "Payment Service - Development"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-fraud-service
+  labels:
+    environment: dev
+    tier: application
+  annotations:
+    description: "Fraud Detection Service - Development"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-notification-service
+  labels:
+    environment: dev
+    tier: application
+  annotations:
+    description: "Notification Service - Development"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-transaction-service
+  labels:
+    environment: dev
+    tier: application
+  annotations:
+    description: "Transaction Service - Development"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-user-service
+  labels:
+    environment: dev
+    tier: application
+  annotations:
+    description: "User Service - Development"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-wallet-service
+  labels:
+    environment: dev
+    tier: application
+  annotations:
+    description: "Wallet Service - Development"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-api-gateway
+  labels:
+    environment: dev
+    tier: application
+  annotations:
+    description: "API Gateway - Development"
+
+---
+# Staging Environment
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging-payment-service
+  labels:
+    environment: staging
+    tier: application
+  annotations:
+    description: "Payment Service - Staging"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging-fraud-service
+  labels:
+    environment: staging
+    tier: application
+  annotations:
+    description: "Fraud Detection Service - Staging"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging-notification-service
+  labels:
+    environment: staging
+    tier: application
+  annotations:
+    description: "Notification Service - Staging"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging-transaction-service
+  labels:
+    environment: staging
+    tier: application
+  annotations:
+    description: "Transaction Service - Staging"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging-user-service
+  labels:
+    environment: staging
+    tier: application
+  annotations:
+    description: "User Service - Staging"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging-wallet-service
+  labels:
+    environment: staging
+    tier: application
+  annotations:
+    description: "Wallet Service - Staging"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging-api-gateway
+  labels:
+    environment: staging
+    tier: application
+  annotations:
+    description: "API Gateway - Staging"
+
+---
+# Production Environment
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-payment-service
+  labels:
+    environment: production
+    tier: application
+    criticality: high
+  annotations:
+    description: "Payment Service - Production"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-fraud-service
+  labels:
+    environment: production
+    tier: application
+    criticality: high
+  annotations:
+    description: "Fraud Detection Service - Production"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-notification-service
+  labels:
+    environment: production
+    tier: application
+    criticality: medium
+  annotations:
+    description: "Notification Service - Production"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-transaction-service
+  labels:
+    environment: production
+    tier: application
+    criticality: high
+  annotations:
+    description: "Transaction Service - Production"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-user-service
+  labels:
+    environment: production
+    tier: application
+    criticality: medium
+  annotations:
+    description: "User Service - Production"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-wallet-service
+  labels:
+    environment: production
+    tier: application
+    criticality: high
+  annotations:
+    description: "Wallet Service - Production"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-api-gateway
+  labels:
+    environment: production
+    tier: application
+    criticality: high
+  annotations:
+    description: "API Gateway - Production"
