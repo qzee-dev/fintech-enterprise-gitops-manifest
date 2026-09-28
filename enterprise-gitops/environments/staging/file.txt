@@ -1,1 +1,9 @@
+10. environments/staging/{fraud,notification,transaction,user,wallet,api-gateway}/values.yaml (SCALED)
+Same pattern as staging payment-service, adjust resources:
 
+fraud-service: 2-6 replicas, 400m-1500m CPU, 768Mi-1.5Gi mem
+notification-service: 2-5 replicas, 100m-500m CPU, 256Mi-512Mi mem
+transaction-service: 3-10 replicas, 250m-1200m CPU, 512Mi-1Gi mem
+user-service: 2-6 replicas, 150m-800m CPU, 384Mi-768Mi mem
+wallet-service: 2-6 replicas, 150m-800m CPU, 384Mi-768Mi mem
+api-gateway: 3-10 replicas, 200m-1000m CPU, 512Mi-1Gi mem
