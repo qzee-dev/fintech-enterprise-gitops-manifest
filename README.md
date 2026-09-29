@@ -75,6 +75,29 @@ Contains ArgoCD configuration.
 | `applicationset.yaml` | Automatically generates ArgoCD Applications from environment folders |
 | `project.yaml` | ArgoCD Project with RBAC and deployment boundaries |
 
+### project.yaml
+
+ArgoCD Project that defines:
+
+- Allowed Git repositories (`sourceRepos`)
+- Allowed deployment destinations (`destinations`)
+- RBAC boundaries
+- Cluster resource permissions
+
+Example restrictions:
+
+- Only deploy manifests from:
+  `https://github.com/qzee-dev/fintech-enterprise-gitops-manifest.git`
+
+- Only deploy into namespaces matching:
+  - `dev-*`
+  - `staging-*`
+  - `production-*`
+
+- Allows management of cluster-scoped `Namespace` resources
+
+This prevents Applications from deploying outside approved repositories and environments.
+
 ---
 
 ### `environments/`
@@ -275,4 +298,6 @@ Helm's job is to:
 4. Render*`templates/*.yaml`.
 
 The rendered*Kubernetes*manifests are then synchronized an* deployed by ArgoCD.
+
+
 ````*
