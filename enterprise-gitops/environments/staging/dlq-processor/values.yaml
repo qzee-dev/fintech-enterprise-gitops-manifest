@@ -1,0 +1,107 @@
+replicaCount: 2
+
+image:
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/dlq-processor"
+  tag: "1.0.0"
+  digest: ""
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3009
+  targetPort: 3009
+
+healthChecks:
+  path: /health
+  livenessInitialDelaySeconds: 30
+  readinessInitialDelaySeconds: 10
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+kafka:
+  enabled: true
+  bootstrapServers: "kafka:29092"
+
+keda:
+  enabled: true
+  minReplicaCount: 2
+  maxReplicaCount: 5
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "dlq-processor-group"
+        topic: "transaction-failed-dlq"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "dlq-processor-group"
+        topic: "fraud-check-dlq"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "dlq-processor-group"
+        topic: "notification-dlq"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "dlq-processor-group"
+        topic: "payment-failed-dlq"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
+
+serviceAccount:
+  create: true
+  name: ""
+
+env:
+  - name: NODE_ENV
+    value: "staging"
+  - name: ENVIRONMENT
+    value: "staging"
+
+envFrom: []
+volumes: []
+volumeMounts: []
+affinity: {}
+tolerations: []
+nodeSelector: {}
+
+ingress:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: true
+  allowIngress: []
+  allowEgress:
+    - ports:
+        - protocol: UDP
+          port: 53
+    - ports:
+        - protocol: TCP
+          port: 29092
