@@ -1,1 +1,107 @@
+replicaCount: 3
 
+image:
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/notification-service"
+  tag: "1.0.0"
+  digest: ""
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3006
+  targetPort: 3006
+
+healthChecks:
+  path: /health
+  livenessInitialDelaySeconds: 30
+  readinessInitialDelaySeconds: 10
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 3
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+kafka:
+  enabled: true
+  bootstrapServers: "kafka:29092"
+
+keda:
+  enabled: true
+  minReplicaCount: 3
+  maxReplicaCount: 8
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "notification-service-group"
+        topic: "transaction-completed"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "notification-service-group"
+        topic: "payment-completed"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "notification-service-group"
+        topic: "payment-initiated"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "notification-service-group"
+        topic: "fraud-alert"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
+
+serviceAccount:
+  create: true
+  name: ""
+
+env:
+  - name: NODE_ENV
+    value: "production"
+  - name: ENVIRONMENT
+    value: "production"
+
+envFrom: []
+volumes: []
+volumeMounts: []
+affinity: {}
+tolerations: []
+nodeSelector: {}
+
+ingress:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+networkPolicy:
+  enabled: true
+  allowIngress: []
+  allowEgress:
+    - ports:
+        - protocol: UDP
+          port: 53
+    - ports:
+        - protocol: TCP
+          port: 29092

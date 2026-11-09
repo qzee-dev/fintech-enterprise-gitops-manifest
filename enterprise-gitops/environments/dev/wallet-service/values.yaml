@@ -1,14 +1,20 @@
 replicaCount: 2
 
 image:
-  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fraud-service"
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/wallet-service"
   tag: "1.0.0"
+  digest: ""
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
-  port: 8080
-  targetPort: 8080
+  port: 3002
+  targetPort: 3002
+
+healthChecks:
+  path: /health
+  livenessInitialDelaySeconds: 30
+  readinessInitialDelaySeconds: 10
 
 resources:
   requests:
@@ -23,16 +29,36 @@ autoscaling:
   minReplicas: 2
   maxReplicas: 6
   targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+kafka:
+  enabled: false
+  bootstrapServers: ""
+
+keda:
+  enabled: false
+  minReplicaCount: 2
+  maxReplicaCount: 6
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers: []
 
 serviceAccount:
   create: true
   name: ""
 
 env:
-  - name: SPRING_PROFILES_ACTIVE
+  - name: NODE_ENV
     value: "dev"
   - name: ENVIRONMENT
     value: "dev"
+
+envFrom: []
+volumes: []
+volumeMounts: []
+affinity: {}
+tolerations: []
+nodeSelector: {}
 
 ingress:
   enabled: false
@@ -43,3 +69,5 @@ podDisruptionBudget:
 
 networkPolicy:
   enabled: true
+  allowIngress: []
+  allowEgress: []

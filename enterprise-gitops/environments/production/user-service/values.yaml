@@ -1,1 +1,73 @@
+replicaCount: 3
 
+image:
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/user-service"
+  tag: "1.0.0"
+  digest: ""
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3001
+  targetPort: 3001
+
+healthChecks:
+  path: /health
+  livenessInitialDelaySeconds: 30
+  readinessInitialDelaySeconds: 10
+
+resources:
+  requests:
+    cpu: 300m
+    memory: 768Mi
+  limits:
+    cpu: 1200m
+    memory: 1536Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+kafka:
+  enabled: false
+  bootstrapServers: ""
+
+keda:
+  enabled: false
+  minReplicaCount: 3
+  maxReplicaCount: 10
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers: []
+
+serviceAccount:
+  create: true
+  name: ""
+
+env:
+  - name: NODE_ENV
+    value: "production"
+  - name: ENVIRONMENT
+    value: "production"
+
+envFrom: []
+volumes: []
+volumeMounts: []
+affinity: {}
+tolerations: []
+nodeSelector: {}
+
+ingress:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+networkPolicy:
+  enabled: true
+  allowIngress: []
+  allowEgress: []

@@ -18,7 +18,7 @@ enterprise-gitops/
 │       ├── values.yaml
 │       └── templates/
 │           ├── deployment.yaml
-│           ├── hpa.yaml
+│           ├── scaledobject.yaml
 │           ├── service.yaml
 │           └── serviceaccount.yaml
 │
@@ -52,7 +52,7 @@ Shared Helm chart used by all microservices.
 | File | Purpose |
 |--------|---------|
 | `deployment.yaml` | Kubernetes Deployment definition |
-| `hpa.yaml` | Horizontal Pod Autoscaler |
+| `scaledobject.yaml` | KEDA ScaledObject for Kafka-backed consumers |
 | `service.yaml` | ClusterIP Service |
 | `serviceaccount.yaml` | Service Account and identity |
 | `_helpers.tpl` | Reusable Helm template functions |
@@ -251,7 +251,7 @@ Responsible f*r:
 
 - Deployment manifests
 - Servi*e manifests
-- HPA manifests
+- KEDA ScaledObject manifests
 - Serv*ceAccount*manifests
 
 ---

@@ -1,14 +1,20 @@
 replicaCount: 2
 
 image:
-  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fraud-service"
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/fraud-service"
   tag: "1.0.0"
+  digest: ""
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
-  port: 8080
-  targetPort: 8080
+  port: 3005
+  targetPort: 3005
+
+healthChecks:
+  path: /health
+  livenessInitialDelaySeconds: 30
+  readinessInitialDelaySeconds: 10
 
 resources:
   requests:
@@ -19,20 +25,47 @@ resources:
     memory: 768Mi
 
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 2
   maxReplicas: 6
   targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+kafka:
+  enabled: true
+  bootstrapServers: "kafka:29092"
+
+keda:
+  enabled: true
+  minReplicaCount: 2
+  maxReplicaCount: 6
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: "kafka:29092"
+        consumerGroup: "fraud-service-group"
+        topic: "transactions"
+        lagThreshold: "10"
+        offsetResetPolicy: "latest"
 
 serviceAccount:
   create: true
   name: ""
 
 env:
-  - name: SPRING_PROFILES_ACTIVE
+  - name: NODE_ENV
     value: "dev"
   - name: ENVIRONMENT
     value: "dev"
+
+envFrom: []
+volumes: []
+volumeMounts: []
+affinity: {}
+tolerations: []
+nodeSelector: {}
 
 ingress:
   enabled: false
@@ -43,3 +76,11 @@ podDisruptionBudget:
 
 networkPolicy:
   enabled: true
+  allowIngress: []
+  allowEgress:
+    - ports:
+        - protocol: UDP
+          port: 53
+    - ports:
+        - protocol: TCP
+          port: 29092

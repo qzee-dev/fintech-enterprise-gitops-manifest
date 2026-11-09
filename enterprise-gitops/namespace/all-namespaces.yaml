@@ -70,6 +70,16 @@ metadata:
     tier: application
   annotations:
     description: "API Gateway - Development"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-dlq-processor
+  labels:
+    environment: dev
+    tier: application
+  annotations:
+    description: "DLQ Processor - Development"
 
 ---
 # Staging Environment
@@ -143,6 +153,16 @@ metadata:
     tier: application
   annotations:
     description: "API Gateway - Staging"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging-dlq-processor
+  labels:
+    environment: staging
+    tier: application
+  annotations:
+    description: "DLQ Processor - Staging"
 
 ---
 # Production Environment
@@ -223,3 +243,14 @@ metadata:
     criticality: high
   annotations:
     description: "API Gateway - Production"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-dlq-processor
+  labels:
+    environment: production
+    tier: application
+    criticality: medium
+  annotations:
+    description: "DLQ Processor - Production"

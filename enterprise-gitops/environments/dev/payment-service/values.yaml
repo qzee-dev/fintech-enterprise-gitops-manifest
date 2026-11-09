@@ -1,38 +1,64 @@
 replicaCount: 2
 
 image:
-  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/payment-service"
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/payment-service"
   tag: "1.0.0"
+  digest: ""
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
-  port: 8080
-  targetPort: 8080
+  port: 3004
+  targetPort: 3004
+
+healthChecks:
+  path: /health
+  livenessInitialDelaySeconds: 30
+  readinessInitialDelaySeconds: 10
 
 resources:
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 150m
+    memory: 384Mi
   limits:
-    cpu: 500m
-    memory: 512Mi
+    cpu: 800m
+    memory: 768Mi
 
 autoscaling:
   enabled: true
   minReplicas: 2
   maxReplicas: 5
   targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+kafka:
+  enabled: false
+  bootstrapServers: ""
+
+keda:
+  enabled: false
+  minReplicaCount: 2
+  maxReplicaCount: 5
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers: []
 
 serviceAccount:
   create: true
   name: ""
 
 env:
-  - name: SPRING_PROFILES_ACTIVE
+  - name: NODE_ENV
     value: "dev"
   - name: ENVIRONMENT
     value: "dev"
+
+envFrom: []
+volumes: []
+volumeMounts: []
+affinity: {}
+tolerations: []
+nodeSelector: {}
 
 ingress:
   enabled: false
@@ -43,3 +69,5 @@ podDisruptionBudget:
 
 networkPolicy:
   enabled: true
+  allowIngress: []
+  allowEgress: []

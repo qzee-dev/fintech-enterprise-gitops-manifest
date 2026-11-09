@@ -20,10 +20,10 @@
 - [ ] Argo CD service account has limited cluster permissions
 
 ## Application Manifests & Helm Charts
-- [x] Chart template fixed: `.Values.image.tag` instead of `.Values.image.digest`
+- [x] Chart image supports immutable digest and tag fallback
 - [x] Liveness and readiness probes added to all deployments
 - [x] Resource requests and limits defined for all services
-- [x] HPA configured with CPU and memory thresholds
+- [x] KEDA ScaledObjects configured for Kafka consumer services; CPU HPA retained for non-consumers
 - [x] PodDisruptionBudget configured for high availability
 - [x] NetworkPolicy configured for security isolation
 - [x] Pod security context enforced (runAsNonRoot, fsGroup)
@@ -31,16 +31,14 @@
 - [x] SecurityContext properly set
 
 ## Environment-Specific Configuration
-- [x] Dev values populated for all 7 services
-- [x] Staging values populated for all 7 services
-- [x] Production values populated for all 7 services with higher resources
+- [x] Dev, staging, and production values populated for all 8 Argo CD services
 - [x] Pod anti-affinity configured in production
-- [x] Environment variables correctly set (SPRING_PROFILES_ACTIVE)
+- [x] Environment and HTTP port values set from fintech-platform service configuration
 - [x] Staging resources calibrated at ~60% of production
 - [x] Dev resources minimal but suitable for testing
 
 ## Namespaces & RBAC
-- [ ] All 21 namespaces created (dev, staging, prod × 7 services)
+- [ ] All 24 namespaces created (dev, staging, production × 8 services)
 - [ ] Namespace labels applied correctly
 - [ ] RBAC roles configured per environment tier
 - [ ] ServiceAccounts created in each namespace
@@ -50,8 +48,8 @@
 ## GitOps Project & ApplicationSet
 - [ ] Argo CD project `fintech-microservices` created
 - [ ] ApplicationSet generator deployed and creating apps
-- [ ] All 21 applications auto-discovered and syncing
-- [ ] Sync policies automated for dev/staging, manual for production
+- [ ] All 24 applications auto-discovered and syncing
+- [ ] Sync policy reviewed: ApplicationSet currently enables automated sync in every environment
 - [ ] Namespace creation enabled via CreateNamespace policy
 
 ## Secrets Management
@@ -109,12 +107,12 @@
 - [ ] Team trained on GitOps workflow
 
 ## Testing & Validation
-- [ ] Dev environment: all 7 services deployed and healthy
+- [ ] Dev environment: all 8 services deployed and healthy
 - [ ] Staging environment: smoke tests passed
 - [ ] Production dry-run: Helm renders correctly
 - [ ] Cross-environment promotion: dev → staging → prod pipeline works
 - [ ] Rollback procedure tested
-- [ ] HPA scaling tested under load
+- [ ] KEDA scaling tested under consumer lag load in dev, staging, and production
 - [ ] NetworkPolicy rules validated
 - [ ] Pod anti-affinity spreading verified
 
@@ -144,7 +142,7 @@
 1. Infrastructure: Deploy EKS cluster (eks-production-platform)
 2. GitOps: Install Argo CD
 3. Manifests: Deploy ApplicationSet + Project
-4. Validation: Verify all 21 apps syncing
+4. Validation: Verify all 24 apps syncing
 5. Secrets: Integrate AWS Secrets Manager
 6. Promotion: Test dev→staging→prod workflow
 7. Governance: Enable branch protection
@@ -162,4 +160,3 @@
 - Monthly: Test disaster recovery procedures
 - Quarterly: Review and audit IAM permissions
 - Continuously: Monitor metrics and alert on anomalies
-

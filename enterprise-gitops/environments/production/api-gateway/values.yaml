@@ -1,1 +1,73 @@
+replicaCount: 4
 
+image:
+  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/api-gateway"
+  tag: "1.0.0"
+  digest: ""
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+healthChecks:
+  path: /health
+  livenessInitialDelaySeconds: 30
+  readinessInitialDelaySeconds: 10
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 4
+  maxReplicas: 15
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+kafka:
+  enabled: false
+  bootstrapServers: ""
+
+keda:
+  enabled: false
+  minReplicaCount: 4
+  maxReplicaCount: 15
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers: []
+
+serviceAccount:
+  create: true
+  name: ""
+
+env:
+  - name: NODE_ENV
+    value: "production"
+  - name: ENVIRONMENT
+    value: "production"
+
+envFrom: []
+volumes: []
+volumeMounts: []
+affinity: {}
+tolerations: []
+nodeSelector: {}
+
+ingress:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 3
+
+networkPolicy:
+  enabled: true
+  allowIngress: []
+  allowEgress: []
