@@ -1,0 +1,71 @@
+replicaCount: 2
+
+image:
+  repository: "AWS_ACCOUNT_ID_REQUIRED.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/web"
+  tag: "1.0.0"
+  digest: ""
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+healthChecks:
+  path: /
+  livenessInitialDelaySeconds: 10
+  readinessInitialDelaySeconds: 5
+
+resources:
+  requests:
+    cpu: 150m
+    memory: 256Mi
+  limits:
+    cpu: 800m
+    memory: 768Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+kafka:
+  enabled: false
+  bootstrapServers: ""
+
+keda:
+  enabled: false
+  minReplicaCount: 2
+  maxReplicaCount: 5
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers: []
+
+serviceAccount:
+  create: true
+  name: ""
+
+env:
+  - name: ENVIRONMENT
+    value: "staging"
+
+envFrom: []
+volumes: []
+volumeMounts: []
+affinity: {}
+tolerations: []
+nodeSelector: {}
+
+ingress:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: true
+  allowIngress: []
+  allowEgress: []
