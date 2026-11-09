@@ -1,46 +1,50 @@
+# Enterprise GitOps layout
 
-DEPLOYMENT SEQUENCE
+This directory is the source for the shared Helm chart, Argo CD configuration,
+and per-environment values. See the [repository runbook](../RUNBOOK.md) for the
+operating procedure and cross-repository handoffs.
 
-# 1. Update Argo CD ApplicationSet (corrected paths)
-kubectl apply -f enterprise-gitops/argocd/project.yaml
-kubectl apply -f enterprise-gitops/argocd/applicationset.yaml
+## Components
 
-# 2. Create namespaces (the ApplicationSet also uses CreateNamespace=true)
-kubectl apply -f enterprise-gitops/namespace/all-namespaces.yaml
+- `chart/microservice/`: shared Kubernetes templates, including Deployment,
+  Service, probes, resource controls, HPA/KEDA, NetworkPolicy, and service
+  account.
+- `environments/<environment>/<service>/values.yaml`: image identity,
+  environment variables, ports, resource sizing, and scaling configuration.
+- `argocd/project.yaml`: source repository and destination policy.
+- `argocd/applicationset.yaml`: generates Argo CD applications for staging and
+  production. It intentionally does not scan `environments/dev/`.
+- `namespace/` and `rbac/`: optional namespace and Argo CD RBAC resources.
 
-# 3. Apply RBAC
-kubectl apply -f enterprise-gitops/rbac/argocd-rbac.yaml
+## Environment behavior
 
-# 4. Verify applications auto-discovered
-kubectl get applications -n argocd
+The source repo's manual dev workflow deploys a release digest directly into
+the existing EKS namespace `dev`. Dev values in this repository are reference
+configuration only.
 
-# 5. Check Helm rendering
-cd enterprise-gitops/chart/microservice
+For staging and production, the source repo's promotion workflows update the
+matching values file with the ECR repository, immutable image tag, and digest.
+Argo CD detects the commit, renders the shared chart, and synchronizes the
+application. Application names and namespaces are `staging-<service>` or
+`production-<service>`. Automated sync and self-heal are enabled.
+
+The ApplicationSet destination is the local cluster where Argo CD runs.
+Staging and production are therefore separate namespaces/configurations, not
+separate EKS clusters unless Argo CD cluster destinations are explicitly
+configured.
+
+## Local validation
+
+From `chart/microservice/`:
+
+```bash
 helm lint .
-helm template dev-payment-service . \
-  --namespace dev-payment-service \
-  -f ../../environments/dev/payment-service/values.yaml
+helm template staging-payment-service . \
+  --namespace staging-payment-service \
+  -f ../../environments/staging/payment-service/values.yaml
+```
 
-# 6. Monitor deployments
-kubectl get pods -n dev-payment-service
-kubectl get pods -n staging-payment-service
-kubectl get pods -n production-payment-service
-
-KEDA is installed as a cluster add-on, separately from this application chart.
-Install KEDA and its CRDs in each destination cluster before syncing any
-application with `keda.enabled: true`. The chart renders Kafka `ScaledObject`
-resources for transaction, fraud, notification, and DLQ consumers; non-consumer
-services retain CPU HPA. The chart does not install or configure Kafka.
-
-Each environment values file specifies the broker address, topics, consumer
-groups, and scaling bounds. The committed `kafka:29092` address matches the
-fintech-platform Compose network. Replace it with a routable cluster broker
-endpoint if EKS does not expose Kafka under that DNS name and port. Configure
-trigger authentication separately if the broker requires credentials. Apply
-the platform Terraform stack and verify
-`kubectl get crd scaledobjects.keda.sh` before applying or syncing the
-ApplicationSet. Consumer workloads also require their environment's database
-and other credentials through externally managed Kubernetes Secrets; this
-chart does not create those Secrets. Replace the sample AWS account ID
-`123456789012` in image repositories with the account that owns the ECR
-repositories before syncing workloads.
+Before first sync, set real staging/production ECR account IDs and ensure the
+selected image tag exists. Configure service Secrets outside Git; values files
+must not contain credentials. KEDA and its CRDs must exist on the destination
+cluster before syncing KEDA-enabled consumer services.

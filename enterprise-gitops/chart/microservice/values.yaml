@@ -41,6 +41,7 @@ keda:
   maxReplicaCount: 5
   pollingInterval: 30
   cooldownPeriod: 300
+  cpuUtilization: null
   triggers: []
 
 serviceAccount:

@@ -19,4 +19,10 @@ spec:
   cooldownPeriod: {{ .Values.keda.cooldownPeriod | default 300 }}
   triggers:
     {{- toYaml .Values.keda.triggers | nindent 4 }}
+    {{- with .Values.keda.cpuUtilization }}
+    - type: cpu
+      metricType: Utilization
+      metadata:
+        value: {{ . | quote }}
+    {{- end }}
 {{- end }}

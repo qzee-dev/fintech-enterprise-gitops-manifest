@@ -13,7 +13,8 @@ spec:
         repoURL: https://github.com/qzee-dev/fintech-enterprise-gitops-manifest.git
         revision: main
         directories:
-          - path: enterprise-gitops/environments/*/*
+          - path: enterprise-gitops/environments/staging/*
+          - path: enterprise-gitops/environments/production/*
 
   template:
 

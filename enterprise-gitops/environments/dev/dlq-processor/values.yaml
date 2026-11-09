@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/dlq-processor"
+  repository: "AWS_ACCOUNT_ID_REQUIRED.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/dlq-processor"
   tag: "1.0.0"
   digest: ""
   pullPolicy: IfNotPresent
@@ -41,6 +41,7 @@ keda:
   maxReplicaCount: 4
   pollingInterval: 30
   cooldownPeriod: 300
+  cpuUtilization: 70
   triggers:
     - type: kafka
       metadata:

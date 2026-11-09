@@ -1,7 +1,7 @@
 replicaCount: 3
 
 image:
-  repository: "123456789012.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/fraud-service"
+  repository: "AWS_ACCOUNT_ID_REQUIRED.dkr.ecr.us-east-1.amazonaws.com/fintech-platform/fraud-service"
   tag: "1.0.0"
   digest: ""
   pullPolicy: IfNotPresent
@@ -41,6 +41,7 @@ keda:
   maxReplicaCount: 10
   pollingInterval: 30
   cooldownPeriod: 300
+  cpuUtilization: 70
   triggers:
     - type: kafka
       metadata:

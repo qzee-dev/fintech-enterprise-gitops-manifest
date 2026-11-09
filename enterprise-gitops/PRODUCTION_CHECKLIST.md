@@ -1,7 +1,7 @@
 # Production Checklist for fintech-enterprise-gitops-manifest
 
-## Infrastructure Foundation (from eks-production-platform)
-- [ ] EKS cluster deployed for dev, staging, and production environments
+## Infrastructure Foundation
+- [ ] EKS cluster(s) exist for the required environments
 - [ ] VPC with proper CIDR ranges: 10.10.0.0/16 (dev), 10.20.0.0/16 (staging), 10.30.0.0/16 (prod)
 - [ ] Node groups configured with appropriate sizing per environment
 - [ ] KMS encryption enabled for Kubernetes secrets
@@ -11,7 +11,7 @@
 - [ ] Terraform state backed up and locked per environment
 
 ## Argo CD Installation & Configuration
-- [ ] Argo CD installed on all clusters (dev, staging, production)
+- [ ] Argo CD installed on the cluster hosting staging and production
 - [ ] Argo CD admin credentials securely stored (not in Git)
 - [ ] Repository registered with GitHub PAT (not hardcoded)
 - [ ] TLS certificates configured for Argo CD server
@@ -23,7 +23,7 @@
 - [x] Chart image supports immutable digest and tag fallback
 - [x] Liveness and readiness probes added to all deployments
 - [x] Resource requests and limits defined for all services
-- [x] KEDA ScaledObjects configured for Kafka consumer services; CPU HPA retained for non-consumers
+- [x] KEDA ScaledObjects configured for Kafka consumers with Kafka-lag and CPU triggers; CPU HPA configured for HTTP-only services
 - [x] PodDisruptionBudget configured for high availability
 - [x] NetworkPolicy configured for security isolation
 - [x] Pod security context enforced (runAsNonRoot, fsGroup)
@@ -31,14 +31,14 @@
 - [x] SecurityContext properly set
 
 ## Environment-Specific Configuration
-- [x] Dev, staging, and production values populated for all 8 Argo CD services
+- [x] Dev, staging, and production values populated for all 11 supported services
 - [x] Pod anti-affinity configured in production
 - [x] Environment and HTTP port values set from fintech-platform service configuration
 - [x] Staging resources calibrated at ~60% of production
 - [x] Dev resources minimal but suitable for testing
 
 ## Namespaces & RBAC
-- [ ] All 24 namespaces created (dev, staging, production × 8 services)
+- [ ] All 22 staging and production namespaces created (2 environments × 11 services)
 - [ ] Namespace labels applied correctly
 - [ ] RBAC roles configured per environment tier
 - [ ] ServiceAccounts created in each namespace
@@ -48,8 +48,9 @@
 ## GitOps Project & ApplicationSet
 - [ ] Argo CD project `fintech-microservices` created
 - [ ] ApplicationSet generator deployed and creating apps
-- [ ] All 24 applications auto-discovered and syncing
-- [ ] Sync policy reviewed: ApplicationSet currently enables automated sync in every environment
+- [ ] All 22 staging and production applications auto-discovered and syncing
+- [ ] Dev is excluded from the ApplicationSet and deployed manually to namespace `dev`
+- [ ] Sync policy reviewed: automated sync and self-heal are enabled for staging and production
 - [ ] Namespace creation enabled via CreateNamespace policy
 
 ## Secrets Management
@@ -62,9 +63,9 @@
 - [ ] Secret rotation policy documented
 
 ## CI/CD & Promotion Workflow
-- [ ] `.github/workflows/promote-dev.yml` created (auto on build success)
-- [ ] `.github/workflows/promote-staging.yml` created (manual dispatch)
-- [ ] `.github/workflows/promote-production.yml` created (manual + approval)
+- [x] Source repo `deploy-dev.yaml` manually updates an existing Deployment in namespace `dev`
+- [x] Source repo staging and production workflows promote immutable release metadata into this repository
+- [ ] Production GitHub Environment required reviewers configured
 - [ ] Helm lint validation in CI pipeline
 - [ ] Argo CD dry-run validation in CI pipeline
 - [ ] Image scanning (Trivy/Snyk) in CI pipeline
@@ -101,18 +102,18 @@
 - [x] ARGOCD_INTEGRATION.md created with full setup guide
 - [x] CODEOWNERS file created
 - [ ] Architecture diagram added (with integration)
-- [ ] Runbook for common operations documented
+- [x] Runbook for common operations documented in `../RUNBOOK.md`
 - [ ] Security considerations documented
 - [ ] Troubleshooting guide completed
 - [ ] Team trained on GitOps workflow
 
 ## Testing & Validation
-- [ ] Dev environment: all 8 services deployed and healthy
+- [ ] Dev environment: required services deployed and healthy by the manual source-repo workflow
 - [ ] Staging environment: smoke tests passed
 - [ ] Production dry-run: Helm renders correctly
-- [ ] Cross-environment promotion: dev → staging → prod pipeline works
+- [ ] Cross-environment promotion: release → manual dev → staging → production workflow works
 - [ ] Rollback procedure tested
-- [ ] KEDA scaling tested under consumer lag load in dev, staging, and production
+- [ ] KEDA lag/CPU scaling limits validated against Kafka partitions, downstream capacity, and load tests in dev, staging, and production
 - [ ] NetworkPolicy rules validated
 - [ ] Pod anti-affinity spreading verified
 
@@ -139,10 +140,10 @@
 ## Notes
 
 ### Critical Path to Production
-1. Infrastructure: Deploy EKS cluster (eks-production-platform)
-2. GitOps: Install Argo CD
+1. Infrastructure: Provision EKS and platform add-ons using the infrastructure repository runbook
+2. GitOps: Install Argo CD on the cluster selected for staging and production
 3. Manifests: Deploy ApplicationSet + Project
-4. Validation: Verify all 24 apps syncing
+4. Validation: Verify all 22 staging and production apps syncing
 5. Secrets: Integrate AWS Secrets Manager
 6. Promotion: Test dev→staging→prod workflow
 7. Governance: Enable branch protection
@@ -150,7 +151,7 @@
 9. Sign-off: Get security + ops approval
 
 ### High-Risk Items
-- Production deployments must require PR review + approval gate
+- Production deployments must require the configured GitHub Environment approval gate; the current workflow pushes values directly to `main` and does not create a PR
 - Database migrations must be tested in staging before prod
 - Image tag promotion must be audited and approved
 - Rollback procedure must be tested monthly
